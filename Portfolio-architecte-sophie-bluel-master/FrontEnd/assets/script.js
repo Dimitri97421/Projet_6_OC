@@ -37,14 +37,12 @@ function displayProjects(data) {
         i.addEventListener('click', function() {
             // Récupére l'ID à partir de l'attribut data-id
             let indexModal = i.getAttribute('data2-id');
-            console.log(indexModal);
 
             // Efface les projets dans la grande gallerie
             const figureBigGallery = document.querySelectorAll('.big-gallery');
             figureBigGallery.forEach(figure => {
                 if (figure.getAttribute('data-id') === indexModal) {
                     figure.remove();
-                    console.log("Removed corresponding figure from big gallery");
                 }
             });
 
@@ -188,6 +186,12 @@ ajouter.addEventListener('click', function(){
         modal.style.display = 'block';
 
     });
+
+    window.addEventListener('click', function (event) {
+        if (event.target === addModal) {
+            addModal.style.display = 'none';
+        }
+    });
 });
 
 // AFFICHAGE PHOTO DU NOUVEAU PROJET
@@ -226,10 +230,15 @@ fileInput.addEventListener('change', function (event) {
 
             reader.onload = function (event) {
                 for(const enfant of ajouterPhoto.children){
-                    enfant.style.display = 'none'; // Enlève les éléments présents dans la div pour laisser place à laperçu de l'image
+                    if (enfant.tagName.toLowerCase() !== 'input') {
+                        enfant.style.display = 'none'; // Cache les éléments présents dans ajouterPhoto pour laisser place à l'imagePreview 
+                    }
                 }
-               // Affiche l'aperçu de l'image dans la div
-                ajouterPhoto.innerHTML += `<div id="imagePreview"> <img src="${event.target.result}" alt="Aperçu de l'image"> </div>`
+               // Crée l'image du nouveau projet dans une div et l'ajoute à ajouterPhoto
+               const imagePreviewDiv = document.createElement('div');
+               imagePreviewDiv.id = 'imagePreview';
+               imagePreviewDiv.innerHTML = `<img src="${event.target.result}" alt="Aperçu de l'image">`;
+               ajouterPhoto.appendChild(imagePreviewDiv);
             };
 
             // Lecture du contenu du fichier en tant que URL de données
@@ -333,6 +342,11 @@ submitImage.addEventListener('click', function(){
                     enfant.style.display = 'block'; // Remets les éléments dans la div ajouterPhoto
                 }
             }
+            fileInput.value = ''; // Réinitialise le bouton input file
+            // Désactive le bouton ajouter photo
+            submitImage.disabled = true;
+            submitImage.style.background = 'gray';
+            
             getProjets();
         })
         .catch(error => {
