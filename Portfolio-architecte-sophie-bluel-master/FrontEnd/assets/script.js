@@ -38,18 +38,6 @@ function displayProjects(data) {
             // Récupére l'ID à partir de l'attribut data-id
             let indexModal = i.getAttribute('data2-id');
 
-            // Efface les projets dans la grande gallerie
-            const figureBigGallery = document.querySelectorAll('.big-gallery');
-            figureBigGallery.forEach(figure => {
-                if (figure.getAttribute('data-id') === indexModal) {
-                    figure.remove();
-                }
-            });
-
-            // Efface les projets dans la petite gallerie
-            const figure = i.parentElement;
-            figure.remove();
-
             // Fonction qui supprime un projet
             async function deleteWork() {
                 const apiUrl = 'http://localhost:5678/api/works/' + indexModal;
@@ -64,6 +52,17 @@ function displayProjects(data) {
 
                     if (response.ok) {
                         console.log('Work deleted successfully.');
+                        // Efface les projets dans la grande gallerie
+                        const figureBigGallery = document.querySelectorAll('.big-gallery');
+                        figureBigGallery.forEach(figure => {
+                            if (figure.getAttribute('data-id') === indexModal) {
+                                figure.remove();
+                            }
+                        });
+
+                        // Efface les projets dans la petite gallerie
+                        const figure = i.parentElement;
+                        figure.remove();
                     } else {
                         console.error('Failed to delete work. Status:', response.status);
                     }
@@ -81,13 +80,44 @@ getProjets();
 
 // FILTRES
 
-// Ajout des écouteurs d'événements pour les boutons de filtre
-document.querySelectorAll('.filtres button').forEach(button => {
-    button.addEventListener('click', () => {
-        const categoryId = button.id; // Récupére l'id du bouton
-        filterProjects(categoryId);
-    });
-});
+function creeBtn(data){
+        let filtres = document.getElementById('filtres');
+        filtres.innerHTML += `<button class="btn0" id="0"> Tous </button>`;
+        data.forEach (category => {
+            filtres.innerHTML += `<button class = "btnFil" id="${category.id}"> ${category.name} </button>`;
+        });
+
+        if(token){
+            document.querySelectorAll('.filtres button').forEach(button => {
+                button.hidden = true;
+                // Cache chaque bouton de la barre de filtres si le token existe
+            });
+        }else{
+            // Ajout des écouteurs d'événements pour les boutons de filtre
+            document.querySelectorAll('.filtres button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const categoryId = button.id; // Récupère l'id du bouton
+                    function couleurBtn(clickedButton) {
+                        document.querySelectorAll('.filtres button').forEach(otherButton => {
+                            //Réinitialise la couleur de l'ancien bouton cliqué
+                            if (otherButton !== clickedButton) {
+                                otherButton.style.background = 'white';
+                                otherButton.style.color = '#1D6154';
+                            }
+                        });
+
+                        // Change la couleur du bouton cliqué
+                        if(clickedButton.style.color !== 'white'){
+                            clickedButton.style.background = '#1D6154';
+                            clickedButton.style.color = 'white';
+                        }
+                    }
+                    couleurBtn(button);
+                    filterProjects(categoryId);
+                });
+            });
+        }
+};
 
 function filterProjects(categoryId) {
     let filteredData;
@@ -108,10 +138,6 @@ function filterProjects(categoryId) {
 const token = localStorage.getItem('token');
 
 if(token){
-    document.querySelectorAll('.filtres button').forEach(button => {
-        button.hidden = true;
-        // Cache chaque bouton de la barre de filtres si le token existe
-    });
 
     // Écrit "logout" à la place de "login" lorsque que l'admin est connecté
     const loglink = document.getElementById("loglink");
@@ -217,7 +243,6 @@ fileInput.addEventListener('change', function (event) {
         submitImage.disabled = true;
         submitImage.style.background = 'gray';
     }else if(inputTitle.value !== ''){
-        console.log(inputTitle.value)
         submitImage.disabled = false;
         submitImage.style.background ='#1D6154';
     }
@@ -266,8 +291,8 @@ function updateDropdown() {
     // Fonction pour récupérer les catégories depuis l'API
     async function fetchCategories() {
         const response = await fetch('http://localhost:5678/api/categories');
-        const data = await response.json();
-
+        let data = await response.json();
+        //data.push({name:"test", id:4});
         // Ajoute chaque catégorie au menu déroulant
         data.forEach(category => {
             const option = document.createElement('option');
@@ -275,6 +300,7 @@ function updateDropdown() {
             option.id = category.id;
             dropdown.add(option);
         });
+        creeBtn(data);
     }
 
     // Appele la fonction pour récupérer les catégories
@@ -301,7 +327,7 @@ inputTitle.addEventListener('change', function(event){
 submitImage.addEventListener('click', function(){
     const titleNewPrj = document.getElementById('titre-nouveau-prj').value; // Récupère le titre du nouveau projet
     const imagePreview = fileInput.files[0]; // Récupère l'image du nouveau projet
-    const dropdown = document.getElementById('categorieDropdown'); // RRécupère le menu déroulant
+    const dropdown = document.getElementById('categorieDropdown'); // Récupère le menu déroulant
     const selectedOption = dropdown.options[dropdown.selectedIndex]; // Récupère l'id de la catégorie sélectionnée dans le menu déroulant
     const cateNewPrj = selectedOption.id;
 

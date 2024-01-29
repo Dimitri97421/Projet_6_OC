@@ -28,6 +28,11 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
 }
+
+html {
+	scroll-behavior: smooth;
+}
+
 body {
 	line-height: 1;
 }
@@ -380,11 +385,26 @@ hr{
 	margin-bottom: 30px;
 }
 
-.filtres button{
+.filtres button:hover{
+	cursor:pointer;
+}
+
+.btnFil{
 	border-radius: 60px;
 	min-width: 100px;
 	color: #1D6154;
 	background-color: white;
+	border-color:#1D6154;
+	font-size: 16px;
+	font-weight: 700;
+	border-width: 1px;
+}
+
+.btn0{
+	border-radius: 60px;
+	min-width: 100px;
+	color:white;
+	background: #1D6154;
 	border-color:#1D6154;
 	font-size: 16px;
 	font-weight: 700;
@@ -453,6 +473,10 @@ footer nav ul {
 }
 
 /* LOGIN */
+
+header a{
+	text-decoration: none;
+}
 
 .login{
 	font-weight: 600;
