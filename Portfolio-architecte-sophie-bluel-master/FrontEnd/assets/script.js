@@ -292,7 +292,6 @@ function updateDropdown() {
     async function fetchCategories() {
         const response = await fetch('http://localhost:5678/api/categories');
         let data = await response.json();
-        //data.push({name:"test", id:4});
         // Ajoute chaque catégorie au menu déroulant
         data.forEach(category => {
             const option = document.createElement('option');
